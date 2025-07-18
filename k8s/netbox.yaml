@@ -74,7 +74,7 @@ spec:
           database: app
           username: app
           existingSecretName: netbox-db-app
-          existingSecretKey: pgpass
+          existingSecretKey: password
         
         loginRequired: true
         # plugins: 
