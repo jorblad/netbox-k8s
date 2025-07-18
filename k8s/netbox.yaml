@@ -57,10 +57,7 @@ spec:
           ## @param postgresql.enabled Whether to deploy a PostgreSQL server to satisfy the applications database requirements
           ## To use an external database set this to false and configure the externalDatabase parameters
           ##
-          enabled: true
-          auth:
-            username: netbox
-            database: netbox
+          enabled: false
 
         ## External database configuration
         ## @param externalDatabase.host Host of the existing database
@@ -72,12 +69,12 @@ spec:
         ## @param externalDatabase.existingSecretKey Key of a secret containing the database credentials
         ##
         externalDatabase:
-          host: netbox-postgresql
+          host: netbox-db-rw
           port: 5432
-          database: netbox
-          username: netbox
-          existingSecretName: netbox-postgresql
-          existingSecretKey: postgres-password
+          database: app
+          username: app
+          existingSecretName: netbox-db-app
+          existingSecretKey: pgpass
         
         loginRequired: true
         # plugins: 
