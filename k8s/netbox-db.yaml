@@ -1,0 +1,29 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: netbox-db
+  namespace: netbox
+spec:
+  instances: 2 # Number of PostgreSQL replicas
+  enableSuperuserAccess: true
+  managed:
+    roles:
+    - name: netbox
+      superuser: true
+      login: true
+
+    - name: app
+      superuser: true
+      login: true
+
+  storage:
+    pvcTemplate:
+      accessModes:
+      - ReadWriteMany
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: longhorn
+  monitoring:
+    enablePodMonitor: true
+  primaryUpdateStrategy: unsupervised

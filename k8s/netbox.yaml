@@ -1,0 +1,165 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: netbox-app
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - ServerSideApply=true
+    - CreateNamespace=true
+  project: default
+  source:
+    chart: netbox
+    repoURL: https://charts.netbox.oss.netboxlabs.com/
+    targetRevision: 6.0.56
+    helm:
+      values: |-
+        superuser:
+          existingSecret: netbox-superuser
+
+        # This is a list of valid fully-qualified domain names (FQDNs) for the NetBox
+        # server. NetBox will not permit write access to the server via any other
+        # hostnames. The first FQDN in the list will be treated as the preferred name.
+        allowedHosts:
+          - "*"
+
+        # Include Pod IP in list of allowed hosts by providing it as the 'POD_IP' envvar
+        # at runtime, which is then used in the configuration.py.
+        allowedHostsIncludesPodIP: true
+
+        # Specify one or more name and email address tuples representing NetBox
+        # administrators. These people will be notified of application errors (assuming
+        # correct email settings are provided).
+        # admins:
+        #   - ['John Doe', 'jdoe@example.com']
+        admins: []
+
+        cors:
+          originAllowAll: true
+        
+        # CSRF settings.  Needed for netbox v3.2.0 and newer. For more information
+        # see https://netboxlabs.com/docs/netbox/en/stable/configuration/security/#csrf_trusted_origins
+        csrf:
+          # The name of the cookie to use for the cross-site request forgery (CSRF)
+          # authentication token.
+          cookieName: csrftoken
+          # Defines a list of trusted origins for unsafe (e.g. POST) requests. This is
+          # a pass-through to Django's CSRF_TRUSTED_ORIGINS setting. Note that each
+          # host listed must specify a scheme (e.g. http:// or `https://).
+          trustedOrigins:
+            - https://ipam.sj-tech.se
+        
+        postgresql:
+          ## @param postgresql.enabled Whether to deploy a PostgreSQL server to satisfy the applications database requirements
+          ## To use an external database set this to false and configure the externalDatabase parameters
+          ##
+          enabled: true
+          auth:
+            username: netbox
+            database: netbox
+
+        ## External database configuration
+        ## @param externalDatabase.host Host of the existing database
+        ## @param externalDatabase.port Port of the existing database
+        ## @param externalDatabase.username Existing username in the external db
+        ## @param externalDatabase.password Password for the above username
+        ## @param externalDatabase.database Name of the existing database
+        ## @param externalDatabase.existingSecretName Name of a secret containing the database credentials
+        ## @param externalDatabase.existingSecretKey Key of a secret containing the database credentials
+        ##
+        externalDatabase:
+          host: netbox-postgresql
+          port: 5432
+          database: netbox
+          username: netbox
+          existingSecretName: netbox-postgresql
+          existingSecretKey: postgres-password
+        
+        loginRequired: true
+        # plugins: 
+        #   - netbox_qrcode
+        # pluginsConfig:
+        #   netbox_qrcode:
+        #     with_text: true
+        #     text_fields:
+        #       - name
+        #       - serial
+        #     font: ArialMT
+        #     custom_text: Uppsatt av SJ-tech
+        #     text_location: right
+        #     qr_version: 1
+        #     qr_error_correction: 0
+        #     qr_box_size: 4
+        #     qr_border: 4
+        #     cable:
+        #       text_fields:
+        #         - _termination_a_device
+        #         - termination_a
+        #         - _termination_b_device
+        #         - termination_b
+        #     rack:
+        #       text_fields:
+        #         - site
+        #         - name
+        #         - facility_id
+        #         - tenant
+        #     device:
+        #       qr_box_size: 6
+        #       text_fields:
+        #         - name
+        #         - primary_ip4
+
+        remoteAuth:
+          enabled: true
+          backends:
+            - social_core.backends.azuread.AzureADOAuth2
+          autoCreateUser: true
+
+        extraConfig:
+          - secret:
+              secretName: azuread-client
+          
+        timeZone: 'Europe/Stockholm'
+        metrics:
+          enabled: true
+        
+        persistence:
+          storageClass: longhorn
+          accessMode: ReadWriteMany
+          size: 20Gi
+          
+        scriptsPersistence:
+          enabled: true
+          storageClass: longhorn
+          accessMode: ReadWriteMany
+          size: 5Gi
+
+        ingress:
+          enabled: true
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-production
+            kubernetes.io/ingress.class: traefik
+            traefik.ingress.kubernetes.io/router.entrypoints: websecure
+            traefik.ingress.kubernetes.io/redirect-entry-point: websecure
+            traefik.ingress.kubernetes.io/redirect-permanent: "true"
+            traefik.ingress.kubernetes.io/preserve-host: "true"
+          hosts:
+            - host: ipam.sj-tech.se
+              paths: 
+                - /
+          tls:
+            - hosts:
+              - ipam.sj-tech.se
+              secretName: ipam-sj-tech-se-tls
+
+        
+
+
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: netbox
