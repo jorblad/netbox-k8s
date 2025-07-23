@@ -118,13 +118,9 @@ spec:
           backends:
             - social_core.backends.azuread.AzureADOAuth2
           autoCreateUser: true
-        extraEnvVarsSecret: "azuread-client"
-        extraEnvs:
-        - name: SOCIAL_AUTH_REDIRECT_IS_HTTPS
-          value: "true"   # if behind HTTPS ingress
-        # extraConfig:
-        #   - secret:
-        #       secretName: azuread-client
+        extraConfig:
+        - secret:
+            secretName: netbox-azuread-config
           
         timeZone: 'Europe/Stockholm'
         metrics:
