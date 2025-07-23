@@ -36,7 +36,10 @@ spec:
         # correct email settings are provided).
         # admins:
         #   - ['John Doe', 'jdoe@example.com']
-        admins: []
+        #admins: []
+
+        powerFeedDefaultAmperage: 10
+        powerFeedDefaultVoltage: 230
 
         cors:
           originAllowAll: true
@@ -115,10 +118,13 @@ spec:
           backends:
             - social_core.backends.azuread.AzureADOAuth2
           autoCreateUser: true
-
-        extraConfig:
-          - secret:
-              secretName: azuread-client
+        extraEnvVarsSecret: "azuread-client"
+        extraEnvs:
+        - name: SOCIAL_AUTH_REDIRECT_IS_HTTPS
+          value: "true"   # if behind HTTPS ingress
+        # extraConfig:
+        #   - secret:
+        #       secretName: azuread-client
           
         timeZone: 'Europe/Stockholm'
         metrics:
