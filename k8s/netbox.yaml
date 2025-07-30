@@ -126,6 +126,13 @@ spec:
         metrics:
           enabled: true
         
+
+        releaseCheck:
+          # This repository is used to check whether there is a new release of NetBox
+          # available. Set to null to disable the version check or use the URL below to
+          # check for release in the official NetBox repository.
+          url: https://api.github.com/repos/netbox-community/netbox/releases
+
         persistence:
           storageClass: longhorn
           accessMode: ReadWriteMany
