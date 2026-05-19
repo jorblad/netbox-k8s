@@ -15,7 +15,7 @@ spec:
   source:
     chart: netbox
     repoURL: https://charts.netbox.oss.netboxlabs.com/
-    targetRevision: 8.2.15
+    targetRevision: 8.2.16
     helm:
       values: |-
         superuser:
