@@ -79,6 +79,7 @@ spec:
           existingSecretName: netbox-db-app
           existingSecretKey: password
         
+        loginRequired: true
         # plugins: 
         #   - netbox_qrcode
         # pluginsConfig:
