@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: stockwire-rental-valkey
-  namespace: stockwire
+  name: netbox-valkey
+  namespace: netbox
   labels:
-    app: stockwire-rental-valkey
+    app: netbox-valkey
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: stockwire-rental-valkey
+      app: netbox-valkey
   template:
     metadata:
       labels:
-        app: stockwire-rental-valkey
+        app: netbox-valkey
     spec:
       containers:
       - name: valkey
@@ -44,7 +44,7 @@ spec:
       volumes:
       - name: valkey-data
         persistentVolumeClaim:
-          claimName: stockwire-rental-valkey-data
+          claimName: netbox-valkey-data
 ---
 apiVersion: v1
 kind: Service
