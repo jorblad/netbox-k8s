@@ -56,7 +56,46 @@ spec:
           trustedOrigins:
             - https://ipam.sj-tech.se
 
-        debug: true
+        debug: false
+
+        valkey:
+          enabled: false
+
+        tasksValkey:
+          enabled: false
+
+        # 2. Configure the background tasks database connection
+        tasksDatabase:
+          host: "netbox-valkey"
+          port: 6379
+          database: 0
+          ssl: false
+          insecureSkipTlsVerify: false
+          caCertPath: ""
+          sentinels: []
+          sentinelService: ""
+          sentinelTimeout: 300
+          username: ""
+          password: ""
+          existingSecretName: ""
+          existingSecretKey: ""
+
+        # 3. Configure the cache database connection
+        cachingDatabase:
+          host: "netbox-valkey"
+          port: 6379
+          database: 1
+          ssl: false
+          insecureSkipTlsVerify: false
+          caCertPath: ""
+          sentinels: []
+          sentinelService: ""
+          sentinelTimeout: 300
+          username: ""
+          password: ""
+          existingSecretName: ""
+          existingSecretKey: ""
+
         
         postgresql:
           ## @param postgresql.enabled Whether to deploy a PostgreSQL server to satisfy the applications database requirements
