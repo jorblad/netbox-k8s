@@ -157,11 +157,11 @@ spec:
         remoteAuth:
           enabled: true
           backends:
-            - social_core.backends.azuread.AzureADOAuth2
+            - social_core.backends.azuread_tenant.AzureADV2TenantOAuth2
           autoCreateUser: true
         extraConfig:
-        - SOCIAL_AUTH_AZUREAD_OAUTH2_KEY: 'd53dfe11-f6cf-4e9a-9e0f-e51c898de2c3'
-        - SOCIAL_AUTH_AZUREAD_OAUTH2_SECRET: 'nmY8Q~7o4mXE4LwMlMQ4BWzp7jBdI5bdHD2ZKalM'
+          - secret:
+              secretName: entra-id-client
           
         timeZone: 'Europe/Stockholm'
         metrics:
