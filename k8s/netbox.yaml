@@ -55,6 +55,8 @@ spec:
           # host listed must specify a scheme (e.g. http:// or `https://).
           trustedOrigins:
             - https://ipam.sj-tech.se
+
+        debug: true
         
         postgresql:
           ## @param postgresql.enabled Whether to deploy a PostgreSQL server to satisfy the applications database requirements
