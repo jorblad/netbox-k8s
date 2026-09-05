@@ -1,6 +1,27 @@
 # netbox-k8s
 Setup for netbox in k8s with cloudnativepg for database
 
+## Plugin image
+
+The repository contains a GitHub Actions workflow that checks the latest NetBox
+release daily and can also be started manually. It builds the custom image
+`ghcr.io/jorblad/netbox-plugins` with the QR Code and DNS plugins, then publishes
+both a versioned tag and `latest-plugins` to GHCR.
+
+The workflow needs permission to write packages. After its first successful run,
+make the package visible to the Kubernetes cluster and set the chart image to:
+
+```yaml
+image:
+	registry: ghcr.io
+	repository: jorblad/netbox-plugins
+	tag: 4.7.0-plugins
+```
+
+Use a versioned tag in the Argo CD values rather than `latest-plugins` so image
+updates remain explicit and reproducible. The workflow can be manually run with
+the `netbox_version` input when testing a specific NetBox release.
+
 ## Entra ID SSO
 
 The NetBox Helm values use the tenant-specific v2 Entra ID backend and expect a

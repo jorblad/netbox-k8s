@@ -1,0 +1,2 @@
+netbox-qrcode>=1.0,<2
+netbox-plugin-dns>=1.7,<2
