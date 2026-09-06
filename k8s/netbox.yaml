@@ -121,38 +121,39 @@ spec:
           existingSecretKey: password
         
         loginRequired: true
-        # plugins: 
-        #   - netbox_qrcode
-        # pluginsConfig:
-        #   netbox_qrcode:
-        #     with_text: true
-        #     text_fields:
-        #       - name
-        #       - serial
-        #     font: ArialMT
-        #     custom_text: Uppsatt av SJ-tech
-        #     text_location: right
-        #     qr_version: 1
-        #     qr_error_correction: 0
-        #     qr_box_size: 4
-        #     qr_border: 4
-        #     cable:
-        #       text_fields:
-        #         - _termination_a_device
-        #         - termination_a
-        #         - _termination_b_device
-        #         - termination_b
-        #     rack:
-        #       text_fields:
-        #         - site
-        #         - name
-        #         - facility_id
-        #         - tenant
-        #     device:
-        #       qr_box_size: 6
-        #       text_fields:
-        #         - name
-        #         - primary_ip4
+        plugins:
+          - netbox_qrcode
+          - netbox_dns
+        pluginsConfig:
+          netbox_qrcode:
+            with_text: true
+            text_fields:
+              - name
+              - serial
+            font: ArialMT
+            custom_text: Uppsatt av SJ-tech
+            text_location: right
+            qr_version: 1
+            qr_error_correction: 0
+            qr_box_size: 4
+            qr_border: 4
+            cable:
+              text_fields:
+                - _termination_a_device
+                - termination_a
+                - _termination_b_device
+                - termination_b
+            rack:
+              text_fields:
+                - site
+                - name
+                - facility_id
+                - tenant
+            device:
+              qr_box_size: 6
+              text_fields:
+                - name
+                - primary_ip4
 
         remoteAuth:
           enabled: true

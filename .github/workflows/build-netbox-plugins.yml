@@ -1,6 +1,7 @@
 name: Build NetBox plugins image
 
 on:
+  pull_request:
   schedule:
     - cron: "23 3 * * *"
   workflow_dispatch:
@@ -59,6 +60,7 @@ jobs:
           docker manifest inspect "ghcr.io/netbox-community/netbox:v${NETBOX_VERSION}" >/dev/null
 
       - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
@@ -68,11 +70,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Build and push image
+      - name: Build image for testing
         uses: docker/build-push-action@v7
         with:
           context: .
-          push: true
+          load: true
           build-args: |
             NETBOX_VERSION=${{ steps.netbox.outputs.version }}
           tags: |
@@ -81,3 +83,50 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.base.name=ghcr.io/netbox-community/netbox:v${{ steps.netbox.outputs.version }}
+
+      - name: Test plugin imports
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.netbox.outputs.version }}-plugins
+        run: |
+          set -euo pipefail
+          docker run --rm --entrypoint /opt/netbox/venv/bin/python "$IMAGE" -c '
+          import netbox_dns
+          import netbox_qrcode
+          print("Plugin imports passed")
+          '
+
+      - name: Test NetBox configuration
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.netbox.outputs.version }}-plugins
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/netbox-ci.yaml" <<'EOF'
+          PLUGINS:
+            - netbox_qrcode
+            - netbox_dns
+          PLUGINS_CONFIG:
+            netbox_qrcode:
+              with_text: true
+              text_fields:
+                - name
+                - serial
+          EOF
+
+          docker run --rm \
+            --entrypoint /opt/netbox/venv/bin/python \
+            -e SECRET_KEY=ci-only-secret-key-that-is-long-enough-for-netbox \
+            -e ALLOWED_HOSTS=localhost \
+            -v "$RUNNER_TEMP/netbox-ci.yaml:/run/config/netbox/netbox.yaml:ro" \
+            "$IMAGE" \
+            /opt/netbox/netbox/manage.py check
+
+      - name: Publish tested image
+        if: github.event_name != 'pull_request'
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          VERSION: ${{ steps.netbox.outputs.version }}
+        run: |
+          set -euo pipefail
+          docker push "$IMAGE:${VERSION}-plugins"
+          docker tag "$IMAGE:${VERSION}-plugins" "$IMAGE:latest-plugins"
+          docker push "$IMAGE:latest-plugins"
