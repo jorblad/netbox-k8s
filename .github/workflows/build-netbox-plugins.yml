@@ -114,7 +114,7 @@ jobs:
 
           docker run --rm \
             --entrypoint /opt/netbox/venv/bin/python \
-            -e SECRET_KEY=ci-only-secret-key-that-is-long-enough-for-netbox \
+            -e SECRET_KEY=ci-only-secret-key-for-plugin-tests-0123456789-abcdef \
             -e ALLOWED_HOSTS=localhost \
             -v "$RUNNER_TEMP/netbox-ci.yaml:/run/config/netbox/netbox.yaml:ro" \
             "$IMAGE" \
