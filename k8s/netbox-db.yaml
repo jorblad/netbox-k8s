@@ -5,6 +5,20 @@ metadata:
   namespace: netbox
 spec:
   instances: 2 # Number of PostgreSQL replicas
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://cnpg/netbox-db/"
+      endpointURL: "http://192.168.210.30:30188"
+      s3Credentials:
+        accessKeyId:
+          name: garage-s3-creds
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: garage-s3-creds
+          key: ACCESS_SECRET_KEY
+        region:
+          name: garage-s3-creds
+          key: AWS_REGION
   enableSuperuserAccess: true
   managed:
     roles:
@@ -27,3 +41,13 @@ spec:
   monitoring:
     enablePodMonitor: true
   primaryUpdateStrategy: unsupervised
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: netbox-db-daily-backup
+  namespace: netbox
+spec:
+  schedule: "0 0 2 * * *" # Daily at 2:00 AM
+  cluster:
+    name: netbox-db
