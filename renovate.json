@@ -5,5 +5,18 @@
   ],
   "argocd": {
     "managerFilePatterns": ["/k8s/.+\\.yaml$/"]
-  }
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update Docker image tags inside Argo CD Application helm values that use the split registry/repository/tag format",
+      "managerFilePatterns": ["/k8s/.+\\.yaml$/"],
+      "matchStrings": [
+        "image:[^\\S\\n]*\\n\\s*registry:\\s*[\"']?(?<depRegistry>[^\\s\"']+)[\"']?\\s*\\n\\s*repository:\\s*[\"']?(?<depName>[^\\s\"']+)[\"']?\\s*\\n\\s*tag:\\s*[\"']?(?<currentValue>[^\\s\"']+)[\"']?"
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker",
+      "packageNameTemplate": "{{{depRegistry}}}/{{{depName}}}"
+    }
+  ]
 }
