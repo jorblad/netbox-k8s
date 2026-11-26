@@ -21,7 +21,7 @@ spec:
         image:
           registry: ghcr.io
           repository: jorblad/netbox-plugins
-          tag: 4.7.5-plugins
+          tag: 4.7.6-plugins
         superuser:
           existingSecret: netbox-superuser
 
